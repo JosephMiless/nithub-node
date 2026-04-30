@@ -1,10 +1,11 @@
 {
   "development": {
-    "username": "user",
-    "password": "password",
-    "database": "demo_db",
+    "username": "postgres",
+    "password": "1234567890",
+    "database": "task-manager",
     "host": "127.0.0.1",
-    "dialect": "postgres"
+    "dialect": "postgres",
+    "port": 5433
   },
   "test": {
     "username": "root",

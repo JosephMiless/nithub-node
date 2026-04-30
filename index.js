@@ -1,18 +1,24 @@
+const dotenv = require("dotenv");
+dotenv.config();
 const express = require("express");
 const { Sequelize, DataTypes, where } = require("sequelize");
-const { User } = require("./db/models");
-
+const { User, Task } = require("./db/models");
 
 const app = express();
 
 app.use(express.json());
 
-const sequelize = new Sequelize("demo_db", "user", "password", {
-  host: "localhost",
-  dialect: "postgres",
-  logging: console.log,
-});
-
+const sequelize = new Sequelize(
+  process.env.DATABASE_NAME,
+  process.env.DATABASE_USERNAME,
+  process.env.DATABASE_PASSWORD,
+  {
+    host: process.env.DATABASE_HOST,
+    dialect: process.env.DATABASE_DIALECT,
+    port: process.env.DATABASE_PORT,
+    logging: console.log,
+  },
+);
 
 // const User = sequelize.define(
 //   "User",
@@ -54,12 +60,17 @@ app.get("/users", async (req, res) => {
 
   if (isActive) {
     const activeUsers = await User.findAll({ where: { isActive: true } });
-    
+
     if (activeUsers.length === 0) {
-      return res.status(404).json({ message: "No active users found"});
+      return res.status(404).json({ message: "No active users found" });
     }
 
-    return res.status(200).json({ message: "All active users retrieved successfully", activeUsers });
+    return res
+      .status(200)
+      .json({
+        message: "All active users retrieved successfully",
+        activeUsers,
+      });
   }
 
   const users = await User.findAll();
@@ -68,7 +79,9 @@ app.get("/users", async (req, res) => {
     return res.status(404).json({ message: "No users found" });
   }
 
-  return res.status(200).json({ message: "All users retrieved successfully", users });
+  return res
+    .status(200)
+    .json({ message: "All users retrieved successfully", users });
 });
 
 app.post("/user", async (req, res) => {
@@ -85,7 +98,6 @@ app.post("/user", async (req, res) => {
 
   return res.status(201).json({ message: "user added successfuly", newUser });
 });
-
 
 app.get("/user/:id", (req, res) => {
   const id = req.params.id;
@@ -152,7 +164,18 @@ app.delete("/user/:id", (req, res) => {
   return res.status(201).json({ message: "user updated successfully", users });
 });
 
-app.listen(1234, async () => {
+
+app.get('/tasks', async (req, res) => {
+  console.log(Task)
+  const tasks = await Task.findAll({});
+  console.log(tasks)
+
+  return res.status(200).json({message: 'tasks retrieved successfully', tasks})
+})
+
+
+
+app.listen(process.env.PORT, async () => {
   await sequelize.authenticate();
   // await sequelize.sync({ force: true });
   console.log("Server is running on port http://localhost:1234");

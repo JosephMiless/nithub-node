@@ -9,10 +9,16 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
+
+      User.hasMany(models.Task, {
+        foreignKey: 'assigneeId',
+        as: 'tasks'
+      })
     }
   }
   User.init(
     {
+      id:{type: DataTypes.INTEGER , primaryKey: true, autoIncrement: true},
       firstName: { type: DataTypes.STRING, allowNull: false },
       lastName: { type: DataTypes.STRING, allowNull: false },
       email: { 
