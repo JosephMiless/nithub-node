@@ -179,3 +179,5 @@ app.listen(process.env.PORT, async () => {
   // await sequelize.sync({ force: true });
   console.log(`Server is running on port http://localhost:${process.env.PORT}`);
 });
+
+// update for pull
