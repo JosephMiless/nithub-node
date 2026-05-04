@@ -65,12 +65,10 @@ app.get("/users", async (req, res) => {
       return res.status(404).json({ message: "No active users found" });
     }
 
-    return res
-      .status(200)
-      .json({
-        message: "All active users retrieved successfully",
-        activeUsers,
-      });
+    return res.status(200).json({
+      message: "All active users retrieved successfully",
+      activeUsers,
+    });
   }
 
   const users = await User.findAll();
@@ -88,6 +86,12 @@ app.post("/user", async (req, res) => {
   // 1. get the data from the req body
   let user = req.body;
 
+  if (!user.email || !user.firstName || !user.lastName || !user.password) {
+    return res.status(400).json({
+      error: "firstName, lastName, email, and password are required",
+    });
+  }
+
   // 2. check if the user already exists
   const foundUser = await User.findOne({ where: { email: user.email } });
 
@@ -99,10 +103,10 @@ app.post("/user", async (req, res) => {
   return res.status(201).json({ message: "user added successfuly", newUser });
 });
 
-app.get("/user/:id", (req, res) => {
+app.get("/user/:id", async (req, res) => {
   const id = req.params.id;
 
-  const foundUser = users.find((user) => user.id == id);
+  const foundUser = await User.findOne({ where: { id } });
 
   if (!foundUser) {
     return res
@@ -113,70 +117,65 @@ app.get("/user/:id", (req, res) => {
   return res.status(200).json(foundUser);
 });
 
-app.patch("/user/:id", (req, res) => {
+app.patch("/user/:id", async (req, res) => {
   const id = req.params.id;
-  const updatedData = req.body;
-  console.log(updatedData);
-  let foundUser = users.find((u) => u.id == id);
-  console.log(foundUser);
+  const updateData = req.body;
+  let foundUser = await User.findOne({ where: { id } });
 
   if (!foundUser)
     return res
       .status(404)
       .json({ message: "this user does not exist in our record" });
 
-  let updatedUser = { ...foundUser, ...updatedData };
+  const updatedUser = await User.update({ ...updateData }, { where: { id } });
 
   return res
     .status(201)
     .json({ message: "user updated successfully", updatedUser });
 });
 
-app.put("/user/:id", (req, res) => {
-  const id = req.params.id;
-  const updatedData = req.body;
+// app.put("/user/:id", (req, res) => {
+//   const id = req.params.id;
+//   const updatedData = req.body;
 
-  const foundUser = users.find((u) => (u.id = id));
+//   const foundUser = users.find((u) => (u.id = id));
+
+//   if (!foundUser) return res.status(404).json({ message: "user not found" });
+
+//   const updatedUser = {
+//     id: foundUser.id,
+//     createdAt: foundUser.createdAt,
+//     ...updatedData,
+//   };
+
+//   return res
+//     .status(201)
+//     .json({ message: "user updated successfully", updatedUser });
+// });
+
+app.delete("/user/:id", async (req, res) => {
+  const id = req.params.id;
+
+  const foundUser = User.findOne({ where: { id } });
 
   if (!foundUser) return res.status(404).json({ message: "user not found" });
 
-  const updatedUser = {
-    id: foundUser.id,
-    createdAt: foundUser.createdAt,
-    ...updatedData,
-  };
+  await User.destroy({where: {id}})
 
+  return res.status(201).json({ message: "user deleted successfully" });
+});
+
+app.get("/tasks", async (req, res) => {
+  const tasks = await Task.findAll();
+  if(tasks.length === 0) return res.status(404).json({error: "There are currently no available tasks"})
+  
   return res
-    .status(201)
-    .json({ message: "user updated successfully", updatedUser });
+    .status(200)
+    .json({ message: "tasks retrieved successfully", tasks });
 });
-
-app.delete("/user/:id", (req, res) => {
-  const id = req.params.id;
-  const updatedData = req.body;
-
-  const foundUser = users.find((u) => (u.id = id));
-
-  if (!foundUser) return res.status(404).json({ message: "user not found" });
-
-  users = users.filter((u) => u.id != id);
-
-  return res.status(201).json({ message: "user updated successfully", users });
-});
-
-
-app.get('/tasks', async (req, res) => {
-  console.log(Task)
-  const tasks = await Task.findAll({});
-  console.log(tasks)
-
-  return res.status(200).json({message: 'tasks retrieved successfully', tasks})
-})
-
-
 
 app.listen(process.env.PORT, async () => {
   await sequelize.authenticate();
   // await sequelize.sync({ force: true });
-  console.log("Server is running on port http://localhost:1234");
+  console.log(`Server is running on port http://localhost:${process.env.PORT}`);
 });

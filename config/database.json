@@ -3,9 +3,8 @@
     "username": "Miles",
     "password": "magic7300",
     "database": "demo_db",
-    "host": "127.0.0.1",
-    "dialect": "postgres",
-    "port": 5433
+    "host": "localhost",
+    "dialect": "postgres"
   },
   "test": {
     "username": "root",

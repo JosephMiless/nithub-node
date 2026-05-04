@@ -17,7 +17,7 @@ module.exports = (sequelize, DataTypes) => {
       id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
       title: { type: DataTypes.STRING, allowNull: false },
       description: { type: DataTypes.TEXT, allowNull: false },
-      assigneeId: { type: DataTypes.INTEGER, allowNull: false },
+      assigneeId: { type: DataTypes.INTEGER, allowNull: false, references: {model: 'Users'} },
     },
     {
       sequelize,
