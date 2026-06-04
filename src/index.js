@@ -1,12 +1,18 @@
 const express = require("express");
 const { sequelize } = require("./config/db");
 const cofig = require("./config/env");
+const userRouter = require("./routes/user.routes");
+const errorMiddleware = require("./middleware/error.middleware");
 
 // const { User, Task } = require("../db/models");
 
 const app = express();
 
 app.use(express.json());
+
+app.use("/users", userRouter);
+
+app.use(errorMiddleware);
 
 // app.get("/users", async (req, res) => {
 //   const isActive = req.query.isActive;
